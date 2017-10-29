@@ -65,7 +65,9 @@ def disconnect():
 @io.on('open_game')
 def open_game(data):
     name = data['game_name']
-    _add_game(name, request.sid)
+    if name and request.sid:
+        _add_game(name, request.sid)
+        emit('game_open')
     get_games()
 
 
@@ -84,6 +86,11 @@ def message(data, target):
     
     emit('message', {'from': source, 'data': data}, room=target)
 
+
+@io.on('close_game')
+def close_game():
+    if _remove_game(request.sid):
+        emit('closed')
 
 if __name__ == '__main__':
     io.run(app, debug=True)
