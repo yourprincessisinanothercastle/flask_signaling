@@ -22,7 +22,7 @@ game_details = {
     #"game_name": {
     #    "server": "<socketId>"
     #}
-    'test': {
+    'dummy_no-server-behind': {
         'server': "123"
     }
 }
@@ -65,10 +65,11 @@ def disconnect():
 @io.on('open_game')
 def open_game(data):
     name = data['game_name']
-    if name and request.sid:
-        _add_game(name, request.sid)
-        emit('game_open')
-    get_games()
+    if not game_details.get(name, False):
+        if name and request.sid:
+            _add_game(name, request.sid)
+            emit('game_open')
+            get_games()
 
 
 @io.on('get_games')
@@ -93,4 +94,4 @@ def close_game():
         emit('closed')
 
 if __name__ == '__main__':
-    io.run(app, debug=True)
+    io.run(app, debug=True, host="0.0.0.0")
